@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="CañaData-IA: consulta y análisis de la producción histórica de caña de azúcar en México."
+    />
+    <title>CañaData-IA | Producción de caña en México</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <span class="brand-mark">✦</span
+          ><span>CañaData<span class="brand-accent">-IA</span></span>
+        </div>
+        <p class="sidebar-label">Explorar</p>
+        <nav class="nav-list" aria-label="Navegación principal">
+          <button class="nav-item active" data-view="dashboard">
+            <span>▦</span> Resumen general
+          </button>
+          <button class="nav-item" data-view="historico">
+            <span>⌁</span> Datos históricos
+          </button>
+          <button class="nav-item" data-view="analisis">
+            <span>◒</span> Análisis y tendencias
+          </button>
+        </nav>
+        <p class="sidebar-label">Herramientas</p>
+        <nav class="nav-list">
+          <button class="nav-item" data-view="asistente">
+            <span>✧</span> Pregúntale a la IA
+          </button>
+          <button class="nav-item" data-view="metodologia">
+            <span>ⓘ</span> Metodología
+          </button>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="status-dot"></div>
+          <span>Fuente de datos conectada</span
+          ><small>datos.gob.mx · CSV local</small>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+            ☰
+          </button>
+          <div class="breadcrumb">
+            <span>CañaData-IA</span><b>/</b
+            ><strong id="pageTitle">Resumen general</strong>
+          </div>
+          <div class="top-actions">
+            <span class="last-update">Actualizado hoy, 10:32</span
+            ><button
+              class="icon-button"
+              id="themeToggle"
+              aria-label="Cambiar tema"
+            >
+              ☼
+            </button>
+            <div class="avatar">CD</div>
+          </div>
+        </header>
+
+        <section class="page reference-dashboard" id="view-dashboard">
+          <header class="reference-header"><div class="reference-brand"><span class="reference-logo">ɸ</span><div><strong>CañaData-IA</strong><small>Análisis y recomendaciones de la producción de caña de azúcar</small></div></div><div class="ollama-badge"><i></i> IA local · Ollama + Llama 3B</div></header>
+          <div class="reference-grid">
+            <aside class="query-panel"><h1>Consulta y recomendación</h1><p>Elige los parámetros y escribe tu pregunta.</p><label>Ingenio azucarero<select id="millFilter"><option value="Todos">Todos los ingenios</option></select></label><label>Zafra (periodo)<select id="yearFilter"><option value="Todos">Todas las zafras (2015-2016 a 2025-2026)</option></select></label><label>Indicador de análisis<select id="indicatorFilter"><option>Rendimiento de campo (t/ha)</option><option>Producción de caña (t)</option><option>Superficie cosechada (ha)</option></select></label><div class="question-label"><label for="questionInput">Pregunta o solicitud</label><span>96/300</span></div><textarea id="queryQuestion" maxlength="300">¿Qué ingenios presentan mejor rendimiento de campo y cómo se comparan con el promedio histórico?</textarea><div class="quick-prompts"><button>Mejor rendimiento 2025-2026</button><button>Tendencia de 5 zafras</button><button>Mayor producción de azúcar</button><button>Recomendación general</button></div><button class="consult-button" id="consultButton">✧ &nbsp; Consultar con IA</button><div class="local-note"><span>ⓘ</span>La respuesta se genera con IA local a partir de los datos históricos de producción de caña de azúcar de CONADESUCA.</div></aside>
+            <div class="reference-results"><div class="reference-kpis"><article><span>Ingenios analizados</span><strong id="stateCount">49</strong></article><article><span>Promedio histórico</span><strong id="avgYield">74.21 <small>t/ha</small></strong></article><article class="featured"><span>Mejor rendimiento</span><strong id="bestYield">108.11 <small>t/ha</small></strong></article><article><span>Periodo analizado</span><strong>2015-2016 a<br>2025-2026</strong></article></div><article class="ranking-card"><div class="ranking-heading"><h2>Ranking por rendimiento de campo</h2><span>▏ Promedio histórico 74.21 t/ha</span></div><div class="ranking-row"><b>1</b><strong>Atencingo</strong><em>108.11 t/ha</em><mark>+45.7 %</mark><div class="rank-track"><i class="rank-fill top"></i><span></span></div></div><div class="ranking-row"><b>2</b><strong>El Potrero</strong><em>102.43 t/ha</em><mark>+37.9 %</mark><div class="rank-track"><i class="rank-fill"></i><span></span></div></div><div class="ranking-row"><b>3</b><strong>La Gloria</strong><em>100.76 t/ha</em><mark>+35.8 %</mark><div class="rank-track"><i class="rank-fill"></i><span></span></div></div></article><article class="recommendation-card"><div class="recommendation-heading"><h2>✧ &nbsp; Recomendación de la IA</h2><span>Basada en datos históricos</span></div><div class="recommendation-body"><p>Los ingenios con mejor rendimiento de campo son Atencingo (108.11 t/ha), El Potrero (102.43 t/ha) y La Gloria (100.76 t/ha). Los tres superan el promedio histórico nacional de 74.21 t/ha, con diferencias de 45.7 %, 37.9 % y 35.8 % respectivamente.</p><p>Frente a la tendencia histórica se observa un crecimiento sostenido del rendimiento de campo en los últimos años.</p><div class="recommendation-callout"><strong>RECOMENDACIÓN</strong><p>Tomar como referencia las prácticas de manejo agronómico de estos ingenios (variedades, manejo de suelo, fertilización y control fitosanitario) y evaluar su adopción en otras zonas de producción.</p></div></div></article></div>
+          </div>
+        </section>
+
+        <section class="page dashboard-legacy hidden" id="view-dashboard-old">
+          <div class="hero-row">
+            <div>
+              <p class="eyebrow">CENTRO DE INTELIGENCIA AGRÍCOLA</p>
+              <h1>Producción de caña<br /><em>en perspectiva.</em></h1>
+              <p class="hero-copy">
+                Explora el comportamiento histórico de la producción azucarera
+                en México y obtén recomendaciones con inteligencia artificial.
+              </p>
+            </div>
+            <div class="hero-orbit" aria-hidden="true">
+              <span class="orbit-ring"></span><span class="orbit-leaf">✦</span
+              ><span class="orbit-year">2023<br /><small>zafra</small></span>
+            </div>
+          </div>
+          <div class="filter-card">
+            <div class="filter-heading">
+              <span class="filter-icon">⌄</span>
+              <div>
+                <h2>Configura tu consulta</h2>
+                <p>Selecciona los parámetros para explorar la información.</p>
+              </div>
+            </div>
+            <div class="filters">
+              <label
+                >Estado<select id="stateFilter">
+                  <option value="Todos">Todos los estados</option>
+                </select></label
+              ><label
+                >Ingenio<select id="millFilter">
+                  <option value="Todos">Todos los ingenios</option>
+                </select></label
+              ><label
+                >Zafra<select id="yearFilter">
+                  <option value="Todos">Todas las zafras</option>
+                </select></label
+              ><button class="primary-button" id="applyFilters">
+                Aplicar filtros <span>→</span>
+              </button>
+            </div>
+          </div>
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">VISTA GENERAL</p>
+              <h2>Los datos hablan</h2>
+            </div>
+            <span class="data-badge"><i></i> Datos históricos · 2010–2023</span>
+          </div>
+          <div class="stats-grid">
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Producción total</span
+                ><span class="stat-icon green">✦</span>
+              </div>
+              <strong id="totalProduction">—</strong
+              ><small>toneladas de caña</small>
+              <div class="stat-trend up">
+                ↗ <span id="productionTrend">—</span> vs. periodo anterior
+              </div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Rendimiento promedio</span
+                ><span class="stat-icon yellow">◒</span>
+              </div>
+              <strong id="avgYield">—</strong
+              ><small>toneladas por hectárea</small>
+              <div class="stat-trend up">
+                ↗ <span id="yieldTrend">—</span> tendencia positiva
+              </div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Estados registrados</span
+                ><span class="stat-icon purple">⌖</span>
+              </div>
+              <strong id="stateCount">—</strong
+              ><small>entidades productoras</small>
+              <div class="stat-trend neutral">● Base de datos nacional</div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Mejor zafra</span><span class="stat-icon orange">★</span>
+              </div>
+              <strong id="bestYear">—</strong
+              ><small id="bestYearValue">mayor producción registrada</small>
+              <div class="stat-trend neutral">● Histórico disponible</div>
+            </article>
+          </div>
+          <div class="dashboard-grid">
+            <article class="panel chart-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">EVOLUCIÓN HISTÓRICA</p>
+                  <h3>Producción por zafra</h3>
+                </div>
+                <button class="outline-button" data-view="analisis">
+                  Ver análisis <span>→</span>
+                </button>
+              </div>
+              <div class="chart-wrap">
+                <canvas
+                  id="productionChart"
+                  aria-label="Gráfica de producción por zafra"
+                ></canvas>
+              </div>
+              <div class="chart-legend">
+                <span><i class="legend-line"></i> Producción total</span
+                ><span><i class="legend-dot"></i> Tendencia</span>
+              </div>
+            </article>
+            <article class="panel insight-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">LECTURA INTELIGENTE</p>
+                  <h3>Un dato para empezar</h3>
+                </div>
+                <span class="sparkle">✧</span>
+              </div>
+              <div class="insight-quote">
+                “La producción nacional muestra una recuperación sostenida
+                después de la caída observada en 2020.”
+              </div>
+              <p class="insight-text">
+                Explora los filtros para descubrir qué estados están impulsando
+                esta tendencia o pregunta directamente a la IA.
+              </p>
+              <button class="text-button" data-view="asistente">
+                Abrir asistente de IA <span>→</span>
+              </button>
+            </article>
+          </div>
+        </section>
+
+        <section class="page hidden" id="view-historico">
+          <div class="page-intro">
+            <p class="eyebrow">EXPLORADOR DE DATOS</p>
+            <h1>Datos históricos</h1>
+            <p>
+              Consulta, filtra y revisa los registros de producción de las
+              zafras.
+            </p>
+          </div>
+          <div class="panel table-panel">
+            <div class="table-toolbar">
+              <div class="search-box">
+                <span>⌕</span
+                ><input
+                  id="tableSearch"
+                  placeholder="Buscar estado o ingenio..."
+                  type="search"
+                />
+              </div>
+              <label class="upload-button"
+                >＋ Cargar CSV<input
+                  id="csvUpload"
+                  type="file"
+                  accept=".csv,text/csv"
+              /></label>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Zafra</th>
+                    <th>Estado</th>
+                    <th>Ingenio</th>
+                    <th>Superficie (ha)</th>
+                    <th>Producción (t)</th>
+                    <th>Rendimiento (t/ha)</th>
+                  </tr>
+                </thead>
+                <tbody id="dataTable"></tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <span id="rowCount">0 registros</span
+              ><span>Fuente: datos.gob.mx</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="page hidden" id="view-analisis">
+          <div class="page-intro">
+            <p class="eyebrow">INTERPRETACIÓN DE DATOS</p>
+            <h1>Análisis y tendencias</h1>
+            <p>
+              Observa el comportamiento de la producción y compara regiones.
+            </p>
+          </div>
+          <div class="analysis-grid">
+            <article class="panel chart-panel wide">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">COMPARATIVA</p>
+                  <h3>Producción por estado</h3>
+                </div>
+              </div>
+              <div class="bar-chart" id="stateBars"></div>
+            </article>
+            <article class="panel ranking-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">RANKING</p>
+                  <h3>Estados líderes</h3>
+                </div>
+              </div>
+              <div id="rankingList"></div>
+            </article>
+          </div>
+          <article class="panel recommendation-card">
+            <div class="recommendation-icon">✧</div>
+            <div>
+              <p class="eyebrow">RECOMENDACIÓN AUTOMÁTICA</p>
+              <h3>¿Qué puedes investigar?</h3>
+              <p>
+                Compara el rendimiento de Veracruz y Jalisco en las últimas tres
+                zafras para identificar oportunidades de mejora.
+              </p>
+            </div>
+            <button class="primary-button" data-view="asistente">
+              Preguntar a la IA <span>→</span>
+            </button>
+          </article>
+        </section>
+
+        <section class="page hidden" id="view-asistente">
+          <div class="page-intro">
+            <p class="eyebrow">ASISTENTE DE INTELIGENCIA ARTIFICIAL</p>
+            <h1>Pregúntale a la IA</h1>
+            <p>
+              Obtén respuestas contextualizadas a partir del histórico de
+              producción.
+            </p>
+          </div>
+          <div class="ai-layout">
+            <article class="panel ai-chat">
+              <div class="chat-header">
+                <div class="ai-avatar">✦</div>
+                <div>
+                  <h3>Asistente CañaData</h3>
+                  <span><i></i> Llama 3B · Ollama local</span>
+                </div>
+              </div>
+              <div class="chat-messages" id="chatMessages">
+                <div class="message assistant">
+                  <div class="message-avatar">✦</div>
+                  <div>
+                    Hola. Soy tu asistente para el análisis de caña de azúcar.
+                    Pregúntame sobre tendencias, estados, ingenios o
+                    recomendaciones.
+                  </div>
+                </div>
+              </div>
+              <form class="chat-form" id="chatForm">
+                <textarea
+                  id="questionInput"
+                  rows="2"
+                  placeholder="Ej. ¿Qué estado tuvo el mejor rendimiento en 2022?"
+                  required
+                ></textarea
+                ><button class="send-button" aria-label="Enviar pregunta">
+                  ↑
+                </button>
+              </form>
+            </article>
+            <aside class="panel prompt-panel">
+              <p class="eyebrow">PREGUNTAS SUGERIDAS</p>
+              <button class="suggestion">
+                ¿Cuál fue la zafra con mayor producción?</button
+              ><button class="suggestion">Compara Veracruz y Jalisco.</button
+              ><button class="suggestion">
+                ¿Qué recomendaciones darías para mejorar el rendimiento?
+              </button>
+              <div class="ai-note">
+                <span>ⓘ</span>
+                <p>
+                  Tu información se procesa localmente mediante Ollama. Tus
+                  datos no salen de tu equipo.
+                </p>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="page hidden" id="view-metodologia">
+          <div class="page-intro">
+            <p class="eyebrow">SOBRE EL PROYECTO</p>
+            <h1>Metodología</h1>
+            <p>
+              Conoce cómo CañaData-IA transforma los datos públicos en
+              información útil.
+            </p>
+          </div>
+          <div class="method-grid">
+            <article class="method-step">
+              <span>01</span>
+              <h3>Datos abiertos</h3>
+              <p>
+                Archivos CSV históricos de las zafras publicados en el portal de
+                datos abiertos del Gobierno de México.
+              </p>
+            </article>
+            <article class="method-step">
+              <span>02</span>
+              <h3>Procesamiento</h3>
+              <p>
+                La interfaz filtra y resume los registros para presentar
+                indicadores comparables y fáciles de interpretar.
+              </p>
+            </article>
+            <article class="method-step">
+              <span>03</span>
+              <h3>Inteligencia artificial</h3>
+              <p>
+                El contexto relevante se envía a Llama 3B mediante la API local
+                de Ollama para generar respuestas claras.
+              </p>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status"></div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
