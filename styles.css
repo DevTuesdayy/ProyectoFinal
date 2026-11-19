@@ -182,6 +182,10 @@
 .consult-button:hover {
   background: #006b44;
 }
+.consult-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 .local-note {
   margin-top: 16px;
   padding: 12px 11px;
@@ -362,6 +366,23 @@
 }
 .recommendation-callout p {
   margin: 0;
+}
+.results-placeholder {
+  color: #7b8780;
+  font-size: 12px;
+}
+.recommendation-body .recommendation-error {
+  background: #fdecea;
+  border: 1px solid #f3c2bc;
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #8a2c20;
+}
+.recommendation-source {
+  display: block;
+  margin-top: 14px;
+  color: #7b8780;
+  font-size: 10px;
 }
 .quick-prompts button:first-child {
   cursor: pointer;

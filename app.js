@@ -1,335 +1,231 @@
-/* CañaData-IA - capa de interacción con jQuery, AJAX y Ollama */
-const DEMO_DATA = [
-  ["2023", "Veracruz", "Ingenio La Gloria", "18200", "1456000", "80.0"],
-  ["2023", "Jalisco", "Ingenio Tamazula", "12100", "968000", "80.0"],
-  [
-    "2023",
-    "San Luis Potosí",
-    "Ingenio Plan de Ayala",
-    "10800",
-    "799200",
-    "74.0",
-  ],
-  ["2023", "Oaxaca", "Ingenio El Refugio", "8200", "582200", "71.0"],
-  ["2023", "Tamaulipas", "Ingenio El Mante", "7500", "547500", "73.0"],
-  ["2022", "Veracruz", "Ingenio La Gloria", "17500", "1365000", "78.0"],
-  ["2022", "Jalisco", "Ingenio Tamazula", "12000", "936000", "78.0"],
-  [
-    "2022",
-    "San Luis Potosí",
-    "Ingenio Plan de Ayala",
-    "10600",
-    "763200",
-    "72.0",
-  ],
-  ["2022", "Oaxaca", "Ingenio El Refugio", "8000", "552000", "69.0"],
-  ["2022", "Tamaulipas", "Ingenio El Mante", "7300", "518300", "71.0"],
-  ["2021", "Veracruz", "Ingenio La Gloria", "16800", "1276800", "76.0"],
-  ["2021", "Jalisco", "Ingenio Tamazula", "11800", "908600", "77.0"],
-  [
-    "2021",
-    "San Luis Potosí",
-    "Ingenio Plan de Ayala",
-    "10000",
-    "710000",
-    "71.0",
-  ],
-  ["2020", "Veracruz", "Ingenio La Gloria", "15100", "1057000", "70.0"],
-  ["2020", "Jalisco", "Ingenio Tamazula", "11000", "792000", "72.0"],
-  ["2019", "Veracruz", "Ingenio La Gloria", "16000", "1248000", "78.0"],
-  ["2019", "Jalisco", "Ingenio Tamazula", "11500", "908500", "79.0"],
-];
-let records = DEMO_DATA.map(toRecord),
-  filteredRecords = records.slice();
-function toRecord(r) {
-  return {
-    year: r[0],
-    state: r[1],
-    mill: r[2],
-    area: +r[3],
-    production: +r[4],
-    yield: +r[5],
-  };
-}
-function money(n) {
-  return new Intl.NumberFormat("es-MX", { maximumFractionDigits: 0 }).format(n);
-}
-function unique(key) {
-  return [...new Set(records.map((r) => r[key]))].sort();
-}
-function showToast(msg) {
-  $("#toast").text(msg).addClass("show");
+/* CañaData-IA - interacción del formulario con el backend mediante jQuery y AJAX */
+
+const API_URL = "api";
+const ALL = "Todos"; // Igual que la constante ALL de api/indicadores.php.
+const QUESTION_MAX_LENGTH = 300; // Igual que QUESTION_MAX_LENGTH de api/consulta.php.
+const REQUEST_TIMEOUT_MS = 130000; // Un poco más que OLLAMA_TIMEOUT_SECONDS de api/ollama.php.
+const LARGE_NUMBER = 1000; // Las toneladas y hectáreas se muestran sin decimales.
+const CONSULT_BUTTON_LABEL = "✧ &nbsp; Consultar con IA";
+
+// Llama 3B separa su respuesta en "Análisis:" y "Recomendación:", a veces numeradas o en negritas.
+const SECTION_HEADING = /^\s*(?:\d\.\s*)?(An[aá]lisis|Recomendaci[oó]n)\s*:?\s*/i;
+
+function showToast(message) {
+  $("#toast").text(message).addClass("show");
   setTimeout(() => $("#toast").removeClass("show"), 2800);
 }
-function populateFilters() {
-  unique("state").forEach((v) =>
-    $("#stateFilter").append(`<option>${v}</option>`),
-  );
-  unique("mill").forEach((v) =>
-    $("#millFilter").append(`<option>${v}</option>`),
-  );
-  unique("year").forEach((v) =>
-    $("#yearFilter").append(`<option>${v}</option>`),
-  );
+
+function formatNumber(value) {
+  const fractionDigits = Math.abs(value) >= LARGE_NUMBER ? 0 : 2;
+  return value.toLocaleString("es-MX", { maximumFractionDigits: fractionDigits });
 }
-function applyFilters() {
-  const s = $("#stateFilter").length ? $("#stateFilter").val() : "Todos",
-    m = $("#millFilter").val(),
-    y = $("#yearFilter").val();
-  filteredRecords = records.filter(
-    (r) =>
-      (s === "Todos" || r.state === s) &&
-      (m === "Todos" || r.mill === m) &&
-      (y === "Todos" || r.year === y),
-  );
-  renderAll();
-  showToast(`${filteredRecords.length} registros encontrados`);
+
+// Mismo formato que formatPercent() de api/ollama.php: "+5.2 %" o "-3.1 %".
+function formatPercent(percent) {
+  return `${percent >= 0 ? "+" : ""}${percent.toFixed(1)} %`;
 }
-function renderStats() {
-  const total = filteredRecords.reduce((a, r) => a + r.production, 0),
-    avg = filteredRecords.length
-      ? filteredRecords.reduce((a, r) => a + r.yield, 0) /
-        filteredRecords.length
-      : 0,
-    years = {};
-  filteredRecords.forEach(
-    (r) => (years[r.year] = (years[r.year] || 0) + r.production),
-  );
-  const best = Object.entries(years).sort((a, b) => b[1] - a[1])[0];
-  $("#totalProduction").text(money(total));
-  $("#avgYield").first().html(`${avg.toFixed(1)} <small>t/ha</small>`);
-  $("#stateCount").first().text(new Set(filteredRecords.map((r) => r.mill)).size || 49);
-  $("#bestYear").text(best ? best[0] : "—");
-  $("#bestYearValue").text(
-    best ? `${money(best[1])} toneladas` : "sin registros",
-  );
-  $("#productionTrend").text("8.4%");
-  $("#yieldTrend").text("3.1%");
+
+function formatPeriod([from, to]) {
+  return from === to ? from : `${from} a ${to}`;
 }
-function renderTable() {
-  const q = ($("#tableSearch").val() || "").toLowerCase();
-  const rows = filteredRecords.filter((r) =>
-    `${r.state} ${r.mill} ${r.year}`.toLowerCase().includes(q),
-  );
-  $("#dataTable").html(
-    rows
-      .map(
-        (r) =>
-          `<tr><td>${r.year}</td><td>${r.state}</td><td>${r.mill}</td><td>${money(r.area)}</td><td>${money(r.production)}</td><td>${r.yield.toFixed(1)}</td></tr>`,
-      )
-      .join("") || '<tr><td colspan="6">No se encontraron registros.</td></tr>',
-  );
-  $("#rowCount").text(`${rows.length} registros`);
+
+// Muestra un número con su unidad en letra pequeña, como en el diseño original.
+function showMeasure($element, value, unit) {
+  $element.empty().append(formatNumber(value), " ", $("<small>").text(unit));
 }
-function renderChart() {
-  const canvas = document.getElementById("productionChart"),
-    ctx = canvas.getContext("2d"),
-    box = canvas.getBoundingClientRect(),
-    dpr = window.devicePixelRatio || 1;
-  canvas.width = box.width * dpr;
-  canvas.height = box.height * dpr;
-  ctx.scale(dpr, dpr);
-  const w = box.width,
-    h = box.height,
-    years = [...new Set(filteredRecords.map((r) => r.year))].sort(),
-    vals = years.map((y) =>
-      filteredRecords
-        .filter((r) => r.year === y)
-        .reduce((a, r) => a + r.production, 0),
-    ),
-    max = Math.max(...vals, 1),
-    pad = 25;
-  ctx.strokeStyle = "#edf1ed";
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 4; i++) {
-    const y = pad + (i * (h - pad * 2)) / 3;
-    ctx.beginPath();
-    ctx.moveTo(pad, y);
-    ctx.lineTo(w - pad, y);
-    ctx.stroke();
+
+// Agrega opciones a un <select> a partir de pares [valor, texto visible].
+function addOptions($select, entries) {
+  entries.forEach(([value, label]) => {
+    $select.append($("<option>").val(value).text(label));
+  });
+}
+
+function loadCatalogs() {
+  return $.getJSON(`${API_URL}/catalogos.php`)
+    .done(({ ingenios, zafras, indicadores }) => {
+      addOptions($("#millFilter"), ingenios.map((mill) => [mill, mill]));
+      addOptions($("#yearFilter"), zafras.map((harvest) => [harvest, harvest]));
+      $(`#yearFilter option[value="${ALL}"]`).text(`Todas las zafras (${zafras[0]} a ${zafras.at(-1)})`);
+      addOptions(
+        $("#indicatorFilter"),
+        Object.entries(indicadores).map(([key, { nombre, unidad }]) => [key, `${nombre} (${unidad})`]),
+      );
+      $("#consultButton").prop("disabled", false);
+    })
+    .fail(() => showToast("No se pudieron cargar los datos. Verifica que el servidor PHP esté en ejecución."));
+}
+
+function updateQuestionCounter() {
+  $("#questionCounter").text(`${$("#queryQuestion").val().length}/${QUESTION_MAX_LENGTH}`);
+}
+
+// Los botones de ejemplo llenan la pregunta y ajustan los filtros que necesita.
+function applyQuickPrompt() {
+  const { zafra, indicador, pregunta } = $(this).data();
+  $("#yearFilter").val(zafra);
+  $("#indicatorFilter").val(indicador);
+  $("#queryQuestion").val(pregunta);
+  updateQuestionCounter();
+}
+
+function renderKpis(analysis) {
+  const { unidad } = analysis.indicador;
+  const [best] = analysis.ranking;
+
+  $("#kpiMills").text(analysis.ingenios_analizados);
+  showMeasure($("#kpiAverage"), analysis.promedio, unidad);
+  if (analysis.posicion === null) {
+    $("#kpiHighlightLabel").text(`Mejor ingenio: ${best.ingenio}`);
+    showMeasure($("#kpiHighlight"), best.valor, unidad);
+  } else {
+    $("#kpiHighlightLabel").text(`Posición de ${analysis.ingenio}`);
+    $("#kpiHighlight").text(`${analysis.posicion} de ${analysis.ingenios_en_ranking}`);
   }
-  if (!vals.length) return;
-  ctx.beginPath();
-  vals.forEach((v, i) => {
-    const x = pad + (i * (w - pad * 2)) / Math.max(years.length - 1, 1),
-      y = h - pad - (v / max) * (h - pad * 2);
-    i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
-  });
-  ctx.strokeStyle = "#256b4a";
-  ctx.lineWidth = 3;
-  ctx.stroke();
-  vals.forEach((v, i) => {
-    const x = pad + (i * (w - pad * 2)) / Math.max(years.length - 1, 1),
-      y = h - pad - (v / max) * (h - pad * 2);
-    ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
-    ctx.fillStyle = "#c7e970";
-    ctx.fill();
-    ctx.strokeStyle = "#256b4a";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.fillStyle = "#95a098";
-    ctx.font = "10px DM Sans";
-    ctx.textAlign = "center";
-    ctx.fillText(years[i], x, h - 4);
-  });
+  $("#kpiPeriod").text(formatPeriod(analysis.periodo));
 }
-function renderAnalysis() {
-  const byState = {};
-  filteredRecords.forEach(
-    (r) => (byState[r.state] = (byState[r.state] || 0) + r.production),
-  );
-  const top = Object.entries(byState).sort((a, b) => b[1] - a[1]);
-  const max = top[0]?.[1] || 1;
-  $("#stateBars").html(
-    top
-      .slice(0, 6)
-      .map(
-        ([name, v]) =>
-          `<div class="bar-group"><strong class="bar-value">${(v / 1000000).toFixed(1)}M</strong><div class="bar" style="height:${Math.max((v / max) * 82, 5)}%"></div><span>${name.split(" ")[0]}</span></div>`,
-      )
-      .join(""),
-  );
-  $("#rankingList").html(
-    top
-      .slice(0, 5)
-      .map(
-        ([name, v], i) =>
-          `<div class="rank-row"><span class="rank-number">0${i + 1}</span><span class="rank-name">${name}</span><span class="rank-value">${(v / 1000000).toFixed(2)}M t</span></div>`,
-      )
-      .join(""),
+
+// Las barras se miden contra el primer lugar; la línea vertical marca el promedio nacional.
+function renderRanking(analysis) {
+  const { nombre, unidad } = analysis.indicador;
+  const topValue = analysis.ranking[0].valor;
+  const averagePosition = `${(analysis.promedio_nacional / topValue) * 100}%`;
+
+  $("#rankingTitle").text(`Ranking por ${nombre.toLowerCase()}`);
+  $("#rankingAverage").text(`▏ Promedio nacional ${formatNumber(analysis.promedio_nacional)} ${unidad}`);
+  $("#rankingRows")
+    .empty()
+    .append(
+      analysis.ranking.map((row, index) =>
+        $("<div>", { class: "ranking-row" }).append(
+          $("<b>").text(index + 1),
+          $("<strong>").text(row.ingenio),
+          $("<em>").text(`${formatNumber(row.valor)} ${unidad}`),
+          $("<mark>").text(formatPercent(row.diferencia_pct)),
+          $("<div>", { class: "rank-track" }).append(
+            $("<i>", { class: index === 0 ? "rank-fill top" : "rank-fill" }).css("width", `${(row.valor / topValue) * 100}%`),
+            $("<span>").css("left", averagePosition),
+          ),
+        ),
+      ),
+    );
+}
+
+function clearAnalysis() {
+  $(".reference-kpis strong").text("—");
+  $("#kpiHighlightLabel").text("Mejor ingenio");
+  $("#rankingAverage").empty();
+  $("#rankingRows").empty();
+}
+
+function showRecommendationMessage(message, isError = false) {
+  $("#recommendation")
+    .empty()
+    .append($("<p>", { class: isError ? "recommendation-error" : "results-placeholder" }).text(message));
+}
+
+// El análisis va en párrafos normales y la recomendación en el recuadro amarillo.
+function renderRecommendation(text, analysis) {
+  const $body = $("#recommendation").empty();
+  const millCount = analysis.ingenios_analizados;
+  let $callout = null;
+
+  text
+    .replaceAll("**", "")
+    .split(/\n+/)
+    .forEach((line) => {
+      const heading = line.match(SECTION_HEADING);
+      const content = line.slice(heading ? heading[0].length : 0).trim();
+      if (heading && heading[1].toLowerCase().startsWith("recomend")) {
+        $callout = $("<div>", { class: "recommendation-callout" }).append($("<strong>").text("RECOMENDACIÓN"));
+        $body.append($callout);
+      }
+      if (content) {
+        ($callout ?? $body).append($("<p>").text(content));
+      }
+    });
+
+  $body.append(
+    $("<small>", { class: "recommendation-source" }).text(
+      `Generada con Llama 3B a partir de los indicadores calculados de ${millCount} ` +
+        `${millCount === 1 ? "ingenio" : "ingenios"} (periodo ${formatPeriod(analysis.periodo)}). ` +
+        "Fuente: CONADESUCA, datos.gob.mx.",
+    ),
   );
 }
-function renderAll() {
-  renderStats();
-  renderTable();
-  renderChart();
-  renderAnalysis();
+
+function setLoading(isLoading) {
+  $("#consultButton")
+    .prop("disabled", isLoading)
+    .html(isLoading ? "Analizando datos…" : CONSULT_BUTTON_LABEL);
 }
-function navigate(view) {
+
+function consult(event) {
+  event.preventDefault();
+  const question = $("#queryQuestion").val().trim();
+  if (!question) {
+    showToast("Escribe una pregunta para consultar.");
+    return;
+  }
+
+  setLoading(true);
+  showRecommendationMessage("Llama 3B está analizando los datos calculados…");
+
+  $.ajax({
+    url: `${API_URL}/consulta.php`,
+    method: "POST",
+    contentType: "application/json",
+    dataType: "json",
+    timeout: REQUEST_TIMEOUT_MS,
+    data: JSON.stringify({
+      ingenio: $("#millFilter").val(),
+      zafra: $("#yearFilter").val(),
+      indicador: $("#indicatorFilter").val(),
+      pregunta: question,
+    }),
+  })
+    .done(({ analisis, recomendacion }) => {
+      renderKpis(analisis);
+      renderRanking(analisis);
+      renderRecommendation(recomendacion, analisis);
+    })
+    .fail((xhr) => {
+      // Si solo falló la IA, el backend igual manda los indicadores calculados.
+      const response = xhr.responseJSON ?? {};
+      if (response.analisis) {
+        renderKpis(response.analisis);
+        renderRanking(response.analisis);
+      } else {
+        clearAnalysis();
+      }
+      showRecommendationMessage(
+        response.error ?? "No se pudo completar la consulta. Verifica que el servidor PHP y Ollama estén en ejecución.",
+        true,
+      );
+    })
+    .always(() => setLoading(false));
+}
+
+function showView(view) {
+  const $button = $(`.nav-item[data-view="${view}"]`);
   $(".page").addClass("hidden");
   $(`#view-${view}`).removeClass("hidden");
-  $(".nav-item")
-    .removeClass("active")
-    .filter(`[data-view="${view}"]`)
-    .addClass("active");
-  $("#pageTitle").text($(`[data-view="${view}"]`).first().text().trim());
+  $(".nav-item").removeClass("active");
+  $button.addClass("active");
+  // El último nodo del botón es el texto; el primero es el ícono.
+  $("#pageTitle").text($button.contents().last().text().trim());
   $("#sidebar").removeClass("open");
-  if (view === "dashboard") setTimeout(renderChart, 30);
 }
-function csvToRecords(text) {
-  const lines = text
-    .trim()
-    .split(/\r?\n/)
-    .map((l) => l.split(",").map((x) => x.trim().replace(/^"|"$/g, "")));
-  const header = lines.shift().map((x) => x.toLowerCase());
-  const find = (names) =>
-    header.findIndex((x) => names.some((n) => x.includes(n)));
-  const ix = {
-    year: find(["zafra", "año", "ano"]),
-    state: find(["estado"]),
-    mill: find(["ingenio"]),
-    area: find(["superficie", "hect"]),
-    production: find(["producción", "produccion", "toneladas"]),
-    yield: find(["rendimiento"]),
-  };
-  return lines
-    .filter((r) => r.length >= 3)
-    .map((r) =>
-      toRecord([
-        r[ix.year] || "",
-        r[ix.state] || "",
-        r[ix.mill] || "",
-        r[ix.area] || 0,
-        r[ix.production] || 0,
-        r[ix.yield] || 0,
-      ]),
-    );
-}
-async function askOllama(question) {
-  const context = filteredRecords
-    .slice(0, 30)
-    .map(
-      (r) => `${r.year}|${r.state}|${r.mill}|${r.production}t|${r.yield}t/ha`,
-    )
-    .join("\n");
-  const prompt = `Eres un analista agrícola. Responde en español, con claridad y máximo 120 palabras. Usa únicamente este contexto histórico:\n${context}\n\nPregunta: ${question}`;
-  try {
-    const res = await $.ajax({
-      url: "http://localhost:11434/api/generate",
-      method: "POST",
-      contentType: "application/json",
-      data: JSON.stringify({ model: "llama3.2:3b", prompt, stream: false }),
-    });
-    return res.response || "Ollama no devolvió una respuesta.";
-  } catch (e) {
-    return `No pude conectar con Ollama. Verifica que esté ejecutándose en http://localhost:11434 y que el modelo esté disponible. Mientras tanto, con los datos actuales puedo señalar que ${$("#bestYear").text()} fue la mejor zafra registrada.`;
-  }
-}
+
 $(function () {
-  populateFilters();
-  renderAll();
-  $("#applyFilters").on("click", applyFilters);
-  $("#millFilter,#yearFilter").on("change", applyFilters);
-  $("#tableSearch").on("input", renderTable);
-  $(".nav-item,[data-view]").on("click", function () {
-    const v = $(this).data("view");
-    if (v) navigate(v);
+  $(".nav-item").on("click", function () {
+    showView($(this).data("view"));
   });
   $("#menuToggle").on("click", () => $("#sidebar").toggleClass("open"));
-  $("#themeToggle").on("click", () => showToast("Tema claro activo"));
-  $(".quick-prompts button").on("click", function () {
-    const text = $(this).text();
-    $("#queryQuestion").val(text);
-  });
-  $("#queryQuestion").on("input", function () {
-    $(this).closest(".query-panel").find(".question-label span").text(`${this.value.length}/300`);
-  });
-  $("#consultButton").on("click", async function () {
-    const button = $(this), question = $("#queryQuestion").val().trim();
-    if (!question) return showToast("Escribe una pregunta para consultar");
-    button.prop("disabled", true).text("Analizando datos...");
-    const answer = await askOllama(question);
-    $(".recommendation-body").prepend(`<p class="ai-answer"><strong>Respuesta de Llama 3B:</strong> ${$("<div>").text(answer).html()}</p>`);
-    button.prop("disabled", false).html("✧ &nbsp; Consultar con IA");
-  });
-  $(window).on("resize", () => {
-    if (!$("#view-dashboard").hasClass("hidden")) renderChart();
-  });
-  $("#csvUpload").on("change", function (e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        records = csvToRecords(reader.result);
-        filteredRecords = records.slice();
-        populateFilters();
-        renderAll();
-        showToast("CSV cargado correctamente");
-      } catch (err) {
-        showToast("No se pudo leer el CSV");
-      }
-    };
-    reader.readAsText(file, "UTF-8");
-  });
-  $(".suggestion").on("click", function () {
-    $("#questionInput").val($(this).text()).focus();
-  });
-  $("#chatForm").on("submit", async function (e) {
-    e.preventDefault();
-    const input = $("#questionInput"),
-      q = input.val().trim();
-    if (!q) return;
-    $("#chatMessages").append(
-      `<div class="message user"><div class="message-avatar">CD</div><div>${$("<div>").text(q).html()}</div></div>`,
-    );
-    input.val("");
-    const id = `ai-${Date.now()}`;
-    $("#chatMessages").append(
-      `<div class="message assistant" id="${id}"><div class="message-avatar">✦</div><div>Analizando los datos...</div></div>`,
-    );
-    const answer = await askOllama(q);
-    $(`#${id} div:last-child`).text(answer);
-  });
+  $("#queryQuestion").on("input", updateQuestionCounter);
+  $(".quick-prompts button").on("click", applyQuickPrompt);
+  $("#queryForm").on("submit", consult);
+
+  updateQuestionCounter();
+  loadCatalogs();
 });
