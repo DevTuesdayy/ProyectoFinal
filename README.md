@@ -2,7 +2,7 @@
 
 Aplicación web, adaptable a dispositivos móviles, para consultar y analizar la producción histórica de caña de azúcar en México y obtener recomendaciones generadas con un modelo de IA local (Llama 3B mediante Ollama).
 
-Proyecto final de Desarrollo de aplicaciones web y móviles (LIDTS 8°A, UNACH).
+Proyecto final de Desarrollo de aplicaciones web y móviles (LIDTS 7°A, UNACH).
 
 ## Cómo funciona
 
