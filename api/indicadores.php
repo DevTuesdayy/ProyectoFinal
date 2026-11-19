@@ -67,8 +67,11 @@ function buildAnalysis(array $records, string $mill, string $harvest, string $in
     $millAverages = averageBy($reference, $indicator, 'ingenio');
     arsort($millAverages);
 
+    // Un ingenio con 0 (por ejemplo, que no produce azúcar mascabado) no ocupa un lugar del ranking.
+    $producingMills = array_filter($millAverages, fn ($value) => $value > 0);
+
     $ranking = [];
-    foreach(array_slice($millAverages, 0, RANKING_SIZE, true) as $millName => $value) {
+    foreach(array_slice($producingMills, 0, RANKING_SIZE, true) as $millName => $value) {
         $ranking[] = [
             'ingenio' => $millName,
             'valor' => round($value, 2),
@@ -83,7 +86,10 @@ function buildAnalysis(array $records, string $mill, string $harvest, string $in
     $completeTrend = array_diff_key($trend, [HARVEST_IN_PROGRESS => true]);
     $recentTrend = array_slice($completeTrend, -RECENT_HARVESTS, null, true);
 
-    $position = array_search($mill, array_keys($millAverages), true);
+    // Los empates comparten lugar: la posición es 1 + los ingenios con un valor mayor.
+    $millValue = $millAverages[$mill] ?? null;
+    $position = $millValue === null ? null : 1 + count(array_filter($millAverages, fn ($value) => $value > $millValue));
+    $ties = $millValue === null ? 0 : count(array_filter($millAverages, fn ($value) => $value == $millValue)) - 1;
 
     return[
         'indicador' => ['clave' => $indicator, ...INDICATORS[$indicator]],
@@ -95,7 +101,8 @@ function buildAnalysis(array $records, string $mill, string $harvest, string $in
         'maximo' => round(max($values), 2),
         'minimo' => round(min($values), 2),
         'promedio_nacional' => round($nationalAverage, 2),
-        'posicion' => $position === false ? null : $position + 1,
+        'posicion' => $position,
+        'empatados' => $ties,
         'ingenios_en_ranking' => count($millAverages),
         'ranking' => $ranking,
         'tendencia' => array_map(fn ($value) => round($value, 2), $trend),

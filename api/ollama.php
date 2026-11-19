@@ -12,6 +12,7 @@ const SYSTEM_PROMPT = <<<'TEXT'
     Eres un analista agroindustrial experto en la producción de caña de azúcar en México.
     Responde siempre en español, en un máximo de 150 palabras.
     Usa ÚNICAMENTE los datos calculados que se te proporcionan; no inventes cifras ni ingenios.
+    Los datos corresponden solo al indicador de la línea "Indicador"; si la pregunta menciona otro indicador, acláralo al inicio y responde sobre el indicador de los datos, con su nombre y unidad.
     No hagas cálculos propios: cita solo las cifras y porcentajes que aparecen en los datos.
     Las zafras marcadas como "datos parciales" no son comparables con zafras completas; si las mencionas, aclara que son preliminares.
     Si los datos no alcanzan para responder, dilo claramente.
@@ -40,7 +41,11 @@ function formatAnalysis(array $analysis): string
         "Promedio nacional de referencia: {$analysis['promedio_nacional']} {$unit}",
     ];
     if ($analysis['posicion'] !== null) {
-        $lines[] = "Posición del ingenio: {$analysis['posicion']} de {$analysis['ingenios_en_ranking']}";
+        $ties = $analysis['empatados'] > 0 ? " (empatado con otros {$analysis['empatados']} ingenios)" : '';
+        $lines[] = "Posición del ingenio: {$analysis['posicion']} de {$analysis['ingenios_en_ranking']}{$ties}";
+        if ($analysis['maximo'] == 0) {
+            $lines[] = "Nota: el ingenio sí tiene datos y registró 0 {$unit} en el periodo, es decir, no produjo este indicador.";
+        }
     }
 
     $lines[] = 'Ranking de ingenios (promedio del periodo):';

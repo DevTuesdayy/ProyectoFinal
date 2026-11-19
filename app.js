@@ -81,7 +81,8 @@ function renderKpis(analysis) {
     $("#kpiHighlightLabel").text(`Mejor ingenio: ${best.ingenio}`);
     showMeasure($("#kpiHighlight"), best.valor, unidad);
   } else {
-    $("#kpiHighlightLabel").text(`Posición de ${analysis.ingenio}`);
+    const ties = analysis.empatados > 0 ? ` (empate con ${analysis.empatados})` : "";
+    $("#kpiHighlightLabel").text(`Posición de ${analysis.ingenio}${ties}`);
     $("#kpiHighlight").text(`${analysis.posicion} de ${analysis.ingenios_en_ranking}`);
   }
   $("#kpiPeriod").text(formatPeriod(analysis.periodo));
