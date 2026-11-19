@@ -101,6 +101,7 @@ function buildAnalysis(array $records, string $mill, string $harvest, string $in
         'maximo' => round(max($values), 2),
         'minimo' => round(min($values), 2),
         'promedio_nacional' => round($nationalAverage, 2),
+        'diferencia_nacional_pct' => percentChange($nationalAverage, average($values)),
         'posicion' => $position,
         'empatados' => $ties,
         'ingenios_en_ranking' => count($millAverages),

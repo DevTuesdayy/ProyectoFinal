@@ -26,6 +26,17 @@ function formatPercent(float $percent): string
     return sprintf('%+.1f %%', $percent);
 }
 
+// La comparación se escribe con palabras porque el modelo se equivoca al comparar números por sí solo.
+function describeComparison(float $percent): string
+{
+    $direction = match (true) {
+        $percent > 0 => 'por encima del',
+        $percent < 0 => 'por debajo del',
+        default => 'igual al',
+    };
+    return formatPercent($percent) . " ({$direction} promedio nacional)";
+}
+
 function formatAnalysis(array $analysis): string
 {
     $unit = $analysis['indicador']['unidad'];
@@ -43,6 +54,9 @@ function formatAnalysis(array $analysis): string
     if ($analysis['posicion'] !== null) {
         $ties = $analysis['empatados'] > 0 ? " (empatado con otros {$analysis['empatados']} ingenios)" : '';
         $lines[] = "Posición del ingenio: {$analysis['posicion']} de {$analysis['ingenios_en_ranking']}{$ties}";
+        if ($analysis['diferencia_nacional_pct'] !== null) {
+            $lines[] = "Comparación del ingenio: " . describeComparison($analysis['diferencia_nacional_pct']);
+        }
         if ($analysis['maximo'] == 0) {
             $lines[] = "Nota: el ingenio sí tiene datos y registró 0 {$unit} en el periodo, es decir, no produjo este indicador.";
         }
@@ -51,8 +65,7 @@ function formatAnalysis(array $analysis): string
     $lines[] = 'Ranking de ingenios (promedio del periodo):';
     foreach ($analysis['ranking'] as $index => $row) {
         $position = $index + 1;
-        $difference = formatPercent($row['diferencia_pct']);
-        $lines[] = "{$position}. {$row['ingenio']}: {$row['valor']} {$unit} ({$difference} vs. promedio nacional)";
+        $lines[] = "{$position}. {$row['ingenio']}: {$row['valor']} {$unit}, " . describeComparison($row['diferencia_pct']);
     }
 
     $lines[] = 'Promedio por zafra:';
