@@ -144,9 +144,11 @@ function loadRecords(): array
     }
     ksort($latest);
 
+    // En eficiencia y caña neta un 0 significa "no reportado"; en los tipos de azúcar es producción real de 0.
     return array_map(fn ($r) => [
         ...$r,
         'eficiencia_fabrica' => $r['eficiencia_fabrica'] ?: null,
+        'cana_molida_neta' => $r['cana_molida_neta'] ?: null,
         'rendimiento_campo' => ratio($r['cana_molida_bruta'], $r['superficie_cosechada']),
         'rendimiento_fabrica' => ratio($r['azucar_total'], $r['cana_molida_bruta'], 100),
         'rendimiento_agroindustrial' => ratio($r['azucar_total'], $r['superficie_cosechada']),

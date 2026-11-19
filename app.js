@@ -46,7 +46,9 @@ function loadCatalogs() {
     .done(({ ingenios, zafras, indicadores }) => {
       addOptions($("#millFilter"), ingenios.map((mill) => [mill, mill]));
       addOptions($("#yearFilter"), zafras.map((harvest) => [harvest, harvest]));
-      $(`#yearFilter option[value="${ALL}"]`).text(`Todas las zafras (${zafras[0]} a ${zafras.at(-1)})`);
+      const period = formatPeriod([zafras[0], zafras.at(-1)]);
+      $(`#yearFilter option[value="${ALL}"]`).text(`Todas las zafras (${period})`);
+      $("#dataPeriod").text(`Datos: zafras ${period}`);
       addOptions(
         $("#indicatorFilter"),
         Object.entries(indicadores).map(([key, { nombre, unidad }]) => [key, `${nombre} (${unidad})`]),

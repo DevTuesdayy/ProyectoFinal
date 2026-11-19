@@ -34,8 +34,8 @@
         </nav>
         <div class="sidebar-footer">
           <div class="status-dot"></div>
-          <span>Fuente de datos conectada</span
-          ><small>datos.gob.mx · CSV local</small>
+          <span>Fuente: CONADESUCA (Infocaña)</span
+          ><small>datos.gob.mx · 11 zafras en CSV</small>
         </div>
       </aside>
 
@@ -49,14 +49,7 @@
             ><strong id="pageTitle">Resumen general</strong>
           </div>
           <div class="top-actions">
-            <span class="last-update">Actualizado hoy, 10:32</span
-            ><button
-              class="icon-button"
-              id="themeToggle"
-              aria-label="Cambiar tema"
-            >
-              ☼
-            </button>
+            <span class="last-update" id="dataPeriod"></span>
             <div class="avatar">CD</div>
           </div>
         </header>
@@ -124,8 +117,9 @@
             <p class="eyebrow">SOBRE EL PROYECTO</p>
             <h1>Metodología</h1>
             <p>
-              Conoce cómo CañaData-IA transforma los datos públicos en
-              información útil.
+              Cómo CañaData-IA convierte los datos abiertos de CONADESUCA en
+              indicadores y recomendaciones. La zafra 2025-2026 sigue en curso,
+              por lo que sus cifras son preliminares.
             </p>
           </div>
           <div class="method-grid">
@@ -133,24 +127,27 @@
               <span>01</span>
               <h3>Datos abiertos</h3>
               <p>
-                Archivos CSV históricos de las zafras publicados en el portal de
-                datos abiertos del Gobierno de México.
+                Once archivos CSV de Infocaña (zafras 2015-2016 a 2025-2026)
+                publicados en datos.gob.mx. El backend unifica sus columnas, agrupa
+                los nombres de cada ingenio y toma la última semana reportada.
               </p>
             </article>
             <article class="method-step">
               <span>02</span>
-              <h3>Procesamiento</h3>
+              <h3>Cálculo en PHP</h3>
               <p>
-                La interfaz filtra y resume los registros para presentar
-                indicadores comparables y fáciles de interpretar.
+                El servidor filtra por ingenio y zafra y calcula promedios,
+                máximos, mínimos, ranking y tendencia por zafra con código
+                convencional, sin depender del modelo de IA.
               </p>
             </article>
             <article class="method-step">
               <span>03</span>
-              <h3>Inteligencia artificial</h3>
+              <h3>IA local</h3>
               <p>
-                El contexto relevante se envía a Llama 3B mediante la API local
-                de Ollama para generar respuestas claras.
+                Los resultados calculados se envían a Llama 3B mediante la API
+                local de Ollama, que los explica y formula una recomendación. El
+                modelo no hace cálculos: solo interpreta las cifras recibidas.
               </p>
             </article>
           </div>

@@ -1,9 +1,10 @@
 <?php
 
+require_once __DIR__ . '/indicadores.php';
+
 const OLLAMA_URL = 'http://localhost:11434/api/generate';
 const OLLAMA_MODEL = 'llama3.2:3b';
 const OLLAMA_TIMEOUT_SECONDS = 120;
-const HARVEST_IN_PROGRESS = '2025-2026';
 
 const OLLAMA_TEMPERATURE = 0.2;
 
@@ -52,10 +53,17 @@ function formatAnalysis(array $analysis): string
     $lines[] = 'Promedio por zafra:';
     $previous = null;
     foreach ($analysis['tendencia'] as $harvest => $value) {
-        $change = $previous === null ? '' : ' (' . formatPercent(($value - $previous) / $previous * 100) . ' vs. zafra anterior)';
+        $percent = $previous === null ? null : percentChange($previous, $value);
+        $change = $percent === null ? '' : ' (' . formatPercent($percent) . ' vs. zafra anterior)';
         $note = $harvest === HARVEST_IN_PROGRESS ? ' [zafra en curso, datos parciales]' : '';
         $lines[] = "- {$harvest}: {$value} {$unit}{$change}{$note}";
         $previous = $value;
+    }
+
+    $recent = $analysis['tendencia_reciente'];
+    if ($recent !== null && $recent['cambio_pct'] !== null) {
+        $lines[] = "Últimas {$recent['zafras']} zafras completas (úsalas si preguntan por las zafras más recientes): "
+            . "de {$recent['desde']} a {$recent['hasta']}, cambio total " . formatPercent($recent['cambio_pct']);
     }
 
     return implode("\n", $lines);

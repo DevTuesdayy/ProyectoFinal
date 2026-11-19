@@ -2,6 +2,10 @@
 
 const ALL = 'Todos';
 const RANKING_SIZE = 5;
+const RECENT_HARVESTS = 5;
+
+// Zafra que sigue en curso: sus cifras son parciales y no se comparan con zafras completas.
+const HARVEST_IN_PROGRESS = '2025-2026';
 
 const INDICATORS = [
     'rendimiento_campo' => ['nombre' => 'Rendimiento de campo', 'unidad' => 't/ha'],
@@ -9,7 +13,12 @@ const INDICATORS = [
     'rendimiento_agroindustrial' => ['nombre' => 'Rendimiento agroindustrial', 'unidad' => 't azúcar/ha'],
     'eficiencia_fabrica' => ['nombre' => 'Eficiencia en fábrica', 'unidad' => '%'],
     'azucar_total' => ['nombre' => 'Producción de azúcar', 'unidad' => 't'],
+    'azucar_refinada' => ['nombre' => 'Azúcar refinada', 'unidad' => 't'],
+    'azucar_estandar' => ['nombre' => 'Azúcar estándar', 'unidad' => 't'],
+    'azucar_blanca_especial' => ['nombre' => 'Azúcar blanca especial', 'unidad' => 't'],
+    'azucar_mascabado' => ['nombre' => 'Azúcar mascabado', 'unidad' => 't'],
     'cana_molida_bruta' => ['nombre' => 'Caña molida bruta', 'unidad' => 't'],
+    'cana_molida_neta' => ['nombre' => 'Caña molida neta', 'unidad' => 't'],
     'superficie_cosechada' => ['nombre' => 'Superficie cosechada', 'unidad' => 'ha'],
 ];
 
@@ -39,6 +48,12 @@ function averageBy(array $records, string $indicator, string $groupField): array
     return array_map(average(...), $groups);
 }
 
+// Variación porcentual entre dos valores; null si el valor inicial es 0 porque no se puede dividir.
+function percentChange(float $from, float $to): ?float
+{
+    return $from == 0 ? null : round(($to - $from) / $from * 100, 1);
+}
+
 function buildAnalysis(array $records, string $mill, string $harvest, string $indicator): ?array{
     $selected = filterRecords($records, $mill, $harvest);
     $values = indicatorValues($selected, $indicator);
@@ -64,6 +79,10 @@ function buildAnalysis(array $records, string $mill, string $harvest, string $in
     $trend = averageBy($selected, $indicator, 'zafra');
     ksort($trend);
 
+    // Las zafras completas más recientes responden preguntas como "¿cómo cambió en las últimas cinco zafras?".
+    $completeTrend = array_diff_key($trend, [HARVEST_IN_PROGRESS => true]);
+    $recentTrend = array_slice($completeTrend, -RECENT_HARVESTS, null, true);
+
     $position = array_search($mill, array_keys($millAverages), true);
 
     return[
@@ -80,5 +99,11 @@ function buildAnalysis(array $records, string $mill, string $harvest, string $in
         'ingenios_en_ranking' => count($millAverages),
         'ranking' => $ranking,
         'tendencia' => array_map(fn ($value) => round($value, 2), $trend),
+        'tendencia_reciente' => count($recentTrend) < 2 ? null : [
+            'zafras' => count($recentTrend),
+            'desde' => array_key_first($recentTrend),
+            'hasta' => array_key_last($recentTrend),
+            'cambio_pct' => percentChange(reset($recentTrend), end($recentTrend)),
+        ],
     ];
 }
