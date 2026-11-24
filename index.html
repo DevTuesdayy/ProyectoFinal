@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="CañaData-IA: consulta y análisis de la producción histórica de caña de azúcar en México."
+      content="CañaData IA: consulta y análisis de la producción histórica de caña de azúcar en México."
     />
-    <title>CañaData-IA | Producción de caña en México</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <title>CañaData IA | Producción de caña en México</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -21,7 +22,7 @@
       <aside class="sidebar" id="sidebar">
         <div class="brand">
           <span class="brand-mark">✦</span
-          ><span>CañaData<span class="brand-accent">-IA</span></span>
+          ><span>CañaData <span class="brand-accent">IA</span></span>
         </div>
         <p class="sidebar-label">Explorar</p>
         <nav class="nav-list" aria-label="Navegación principal">
@@ -45,7 +46,7 @@
             ☰
           </button>
           <div class="breadcrumb">
-            <span>CañaData-IA</span><b>/</b
+            <span>CañaData IA</span><b>/</b
             ><strong id="pageTitle">Resumen general</strong>
           </div>
           <div class="top-actions">
@@ -55,48 +56,161 @@
         </header>
 
         <section class="page reference-dashboard" id="view-dashboard">
-          <header class="reference-header"><div class="reference-brand"><span class="reference-logo">ɸ</span><div><strong>CañaData-IA</strong><small>Análisis y recomendaciones de la producción de caña de azúcar</small></div></div><div class="ollama-badge"><i></i> IA local · Ollama + Llama 3B</div></header>
+          <header class="reference-header">
+            <div class="reference-brand">
+              <span class="reference-logo">
+                <svg viewBox="0 0 64 64" aria-hidden="true">
+                  <path d="M25 10h8v44h-8zM31 18c8-8 16-8 21-5-2 8-9 12-21 12M31 32c8-8 16-8 21-5-2 8-9 12-21 12M31 46c8-8 16-8 21-5-2 8-9 12-21 12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="5" />
+                  <path d="M25 24c-7-7-13-8-18-5 2 8 8 12 18 12M25 39c-7-7-13-8-18-5 2 8 8 12 18 12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="5" />
+                </svg>
+              </span>
+              <div>
+                <strong>CañaData <span class="reference-accent">IA</span></strong
+                ><small
+                  >Datos, indicadores y recomendaciones para la industria
+                  azucarera</small
+                >
+              </div>
+            </div>
+            <div class="ollama-badge"><i></i> IA local · Ollama + Llama 3B</div>
+          </header>
           <div class="reference-grid">
             <form class="query-panel" id="queryForm">
               <h1>Consulta y recomendación</h1>
               <p>Elige los parámetros y escribe tu pregunta.</p>
-              <label>Ingenio azucarero
-                <select id="millFilter"><option value="Todos">Todos los ingenios</option></select>
+              <label
+                >Ingenio azucarero
+                <select id="millFilter">
+                  <option value="Todos">Todos los ingenios</option>
+                </select>
               </label>
-              <label>Zafra (periodo)
-                <select id="yearFilter"><option value="Todos">Todas las zafras</option></select>
+              <label
+                >Zafra (periodo)
+                <select id="yearFilter">
+                  <option value="Todos">Todas las zafras</option>
+                </select>
               </label>
-              <label>Indicador de análisis
+              <label
+                >Indicador de análisis
                 <select id="indicatorFilter"></select>
               </label>
               <div class="question-label">
                 <label for="queryQuestion">Pregunta o solicitud</label>
                 <span id="questionCounter"></span>
               </div>
-              <textarea id="queryQuestion" maxlength="300" required>¿Qué ingenios presentan mejor rendimiento de campo y cómo se comparan con el promedio histórico?</textarea>
+              <textarea id="queryQuestion" maxlength="300" required>
+¿Qué ingenios presentan mejor rendimiento de campo y cómo se comparan con el promedio histórico?</textarea
+              >
               <div class="quick-prompts">
-                <button type="button" data-zafra="2025-2026" data-indicador="rendimiento_campo" data-pregunta="¿Qué ingenios tuvieron el mejor rendimiento de campo durante la zafra 2025-2026?">Mejor rendimiento 2025-2026</button>
-                <button type="button" data-zafra="Todos" data-indicador="rendimiento_campo" data-pregunta="¿Cómo ha cambiado el rendimiento de campo durante las últimas cinco zafras?">Tendencia de 5 zafras</button>
-                <button type="button" data-zafra="2024-2025" data-indicador="azucar_total" data-pregunta="¿Cuál fue el ingenio con mayor producción de azúcar durante esta zafra?">Mayor producción de azúcar</button>
-                <button type="button" data-zafra="Todos" data-indicador="rendimiento_campo" data-pregunta="Genera una recomendación basada en los indicadores históricos disponibles.">Recomendación general</button>
+                <button
+                  type="button"
+                  data-zafra="2025-2026"
+                  data-indicador="rendimiento_campo"
+                  data-pregunta="¿Qué ingenios tuvieron el mejor rendimiento de campo durante la zafra 2025-2026?"
+                >
+                  Mejor rendimiento 2025-2026
+                </button>
+                <button
+                  type="button"
+                  data-zafra="Todos"
+                  data-indicador="rendimiento_campo"
+                  data-pregunta="¿Cómo ha cambiado el rendimiento de campo durante las últimas cinco zafras?"
+                >
+                  Tendencia de 5 zafras
+                </button>
+                <button
+                  type="button"
+                  data-zafra="2024-2025"
+                  data-indicador="azucar_total"
+                  data-pregunta="¿Cuál fue el ingenio con mayor producción de azúcar durante esta zafra?"
+                >
+                  Mayor producción de azúcar
+                </button>
+                <button
+                  type="button"
+                  data-zafra="Todos"
+                  data-indicador="rendimiento_campo"
+                  data-pregunta="Genera una recomendación basada en los indicadores históricos disponibles."
+                >
+                  Recomendación general
+                </button>
               </div>
-              <button type="submit" class="consult-button" id="consultButton" disabled>✧ &nbsp; Consultar con IA</button>
-              <div class="local-note"><span>ⓘ</span>La respuesta se genera con IA local (Ollama + Llama 3B) a partir de los datos históricos de producción de caña de azúcar de CONADESUCA.</div>
+              <button
+                type="submit"
+                class="consult-button"
+                id="consultButton"
+                disabled
+              >
+                ✧ &nbsp; Consultar con IA
+              </button>
+              <button type="button" class="reset-button" id="resetButton">
+                ↺ &nbsp; Nueva consulta
+              </button>
+              <div class="local-note">
+                <span>ⓘ</span>La respuesta se genera con IA local (Ollama +
+                Llama 3B) a partir de los datos históricos de producción de caña
+                de azúcar de CONADESUCA.
+              </div>
+              <div class="partial-notice" id="partialNotice" hidden>
+                <span>◷</span>
+                <div><strong>Datos preliminares</strong><br />La zafra 2025-2026 sigue en curso y sus cifras no se comparan con zafras completas.</div>
+              </div>
             </form>
             <div class="reference-results">
               <div class="reference-kpis">
-                <article><span>Ingenios analizados</span><strong id="kpiMills">—</strong></article>
-                <article><span>Promedio de la selección</span><strong id="kpiAverage">—</strong></article>
-                <article class="featured"><span id="kpiHighlightLabel">Mejor ingenio</span><strong id="kpiHighlight">—</strong></article>
-                <article><span>Periodo analizado</span><strong id="kpiPeriod">—</strong></article>
+                <article>
+                  <span>Ingenios analizados</span
+                  ><strong id="kpiMills">—</strong>
+                </article>
+                <article>
+                  <span>Promedio de la selección</span
+                  ><strong id="kpiAverage">—</strong>
+                </article>
+                <article class="featured">
+                  <span id="kpiHighlightLabel">Mejor ingenio</span
+                  ><strong id="kpiHighlight">—</strong>
+                </article>
+                <article>
+                  <span>Periodo analizado</span
+                  ><strong id="kpiPeriod">—</strong>
+                </article>
               </div>
+              <article class="insight-card" id="insightCard" hidden>
+                <span class="insight-icon">✦</span>
+                <div>
+                  <strong>Lectura rápida</strong>
+                  <p id="insightText"></p>
+                </div>
+              </article>
               <article class="ranking-card">
                 <div class="ranking-heading">
                   <h2 id="rankingTitle">Ranking de ingenios</h2>
-                  <span id="rankingAverage"></span>
+                  <div class="ranking-tools">
+                    <span id="rankingAverage"></span>
+                    <button type="button" id="exportButton" disabled>
+                      ⇩ Exportar CSV
+                    </button>
+                  </div>
                 </div>
                 <div id="rankingRows">
-                  <p class="results-placeholder">Elige los parámetros y presiona «Consultar con IA» para calcular los indicadores.</p>
+                  <p class="results-placeholder">
+                    Elige los parámetros y presiona «Consultar con IA» para
+                    calcular los indicadores.
+                  </p>
+                </div>
+              </article>
+              <article class="trend-card">
+                <div class="trend-heading">
+                  <div>
+                    <h2>Evolución por zafra</h2>
+                    <p>Promedio del indicador seleccionado en cada periodo</p>
+                  </div>
+                  <span id="trendUnit"></span>
+                </div>
+                <div class="trend-rows" id="trendRows">
+                  <p class="results-placeholder">
+                    La tendencia aparecerá después de consultar.
+                  </p>
                 </div>
               </article>
               <article class="recommendation-card">
@@ -104,8 +218,15 @@
                   <h2>✧ &nbsp; Recomendación de la IA (Llama 3B)</h2>
                   <span>Basada en datos históricos</span>
                 </div>
-                <div class="recommendation-body" id="recommendation" aria-live="polite">
-                  <p class="results-placeholder">Aquí aparecerá la explicación y la recomendación generada con IA local.</p>
+                <div
+                  class="recommendation-body"
+                  id="recommendation"
+                  aria-live="polite"
+                >
+                  <p class="results-placeholder">
+                    Aquí aparecerá la explicación y la recomendación generada
+                    con IA local.
+                  </p>
                 </div>
               </article>
             </div>
@@ -117,7 +238,7 @@
             <p class="eyebrow">SOBRE EL PROYECTO</p>
             <h1>Metodología</h1>
             <p>
-              Cómo CañaData-IA convierte los datos abiertos de CONADESUCA en
+              Cómo CañaData IA convierte los datos abiertos de CONADESUCA en
               indicadores y recomendaciones. La zafra 2025-2026 sigue en curso,
               por lo que sus cifras son preliminares.
             </p>
@@ -128,8 +249,9 @@
               <h3>Datos abiertos</h3>
               <p>
                 Once archivos CSV de Infocaña (zafras 2015-2016 a 2025-2026)
-                publicados en datos.gob.mx. El backend unifica sus columnas, agrupa
-                los nombres de cada ingenio y toma la última semana reportada.
+                publicados en datos.gob.mx. El backend unifica sus columnas,
+                agrupa los nombres de cada ingenio y toma la última semana
+                reportada.
               </p>
             </article>
             <article class="method-step">
@@ -152,6 +274,10 @@
             </article>
           </div>
         </section>
+        <footer class="site-footer">
+          <span><strong>CañaData IA</strong> · Proyecto final LIDTS 7°A</span>
+          <span>Fuente: CONADESUCA · datos.gob.mx</span>
+        </footer>
       </main>
     </div>
     <div class="toast" id="toast" role="status"></div>

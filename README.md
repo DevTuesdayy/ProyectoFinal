@@ -1,4 +1,4 @@
-# CañaData-IA
+# CañaData IA
 
 Aplicación web, adaptable a dispositivos móviles, para consultar y analizar la producción histórica de caña de azúcar en México y obtener recomendaciones generadas con un modelo de IA local (Llama 3B mediante Ollama).
 
@@ -116,7 +116,13 @@ La zafra 2025-2026 sigue en curso (datos hasta la semana 14), por lo que sus cif
 Devuelve las opciones de los selectores:
 
 ```json
-{ "ingenios": ["Aarón Sáenz Garza", "..."], "zafras": ["2015-2016", "..."], "indicadores": { "rendimiento_campo": { "nombre": "Rendimiento de campo", "unidad": "t/ha" } } }
+{
+  "ingenios": ["Aarón Sáenz Garza", "..."],
+  "zafras": ["2015-2016", "..."],
+  "indicadores": {
+    "rendimiento_campo": { "nombre": "Rendimiento de campo", "unidad": "t/ha" }
+  }
+}
 ```
 
 ### `POST api/consulta.php`
@@ -124,7 +130,12 @@ Devuelve las opciones de los selectores:
 Cuerpo en JSON (`"Todos"` significa sin filtro):
 
 ```json
-{ "ingenio": "Todos", "zafra": "2025-2026", "indicador": "rendimiento_campo", "pregunta": "¿Qué ingenios tuvieron el mejor rendimiento de campo?" }
+{
+  "ingenio": "Todos",
+  "zafra": "2025-2026",
+  "indicador": "rendimiento_campo",
+  "pregunta": "¿Qué ingenios tuvieron el mejor rendimiento de campo?"
+}
 ```
 
 Ejemplo desde la terminal:
@@ -133,25 +144,25 @@ Ejemplo desde la terminal:
 curl -X POST http://localhost:8000/api/consulta.php -d '{"ingenio":"Todos","zafra":"2025-2026","indicador":"rendimiento_campo","pregunta":"¿Qué ingenios tuvieron el mejor rendimiento de campo?"}'
 ```
 
-| Código | Significado |
-|---|---|
-| 200 | `analisis` (indicadores calculados) y `recomendacion` (texto de Llama 3B) |
-| 400 | El cuerpo no es JSON |
-| 404 | No hay datos para esa combinación de ingenio, zafra e indicador |
-| 405 | Se usó un método distinto de POST |
-| 422 | Ingenio, zafra, indicador o pregunta no válidos |
-| 503 | Ollama no está disponible; se devuelve `analisis` sin recomendación |
+| Código | Significado                                                               |
+| ------ | ------------------------------------------------------------------------- |
+| 200    | `analisis` (indicadores calculados) y `recomendacion` (texto de Llama 3B) |
+| 400    | El cuerpo no es JSON                                                      |
+| 404    | No hay datos para esa combinación de ingenio, zafra e indicador           |
+| 405    | Se usó un método distinto de POST                                         |
+| 422    | Ingenio, zafra, indicador o pregunta no válidos                           |
+| 503    | Ollama no está disponible; se devuelve `analisis` sin recomendación       |
 
 ## Configuración
 
 Los valores principales están como constantes al inicio de `api/ollama.php`:
 
-| Constante | Valor | Uso |
-|---|---|---|
-| `OLLAMA_URL` | `http://localhost:11434/api/generate` | Dirección de la API de Ollama |
-| `OLLAMA_MODEL` | `llama3.2:3b` | Modelo que se consulta |
-| `OLLAMA_TEMPERATURE` | `0.2` | Valores bajos hacen que el modelo se apegue a los datos |
-| `OLLAMA_TIMEOUT_SECONDS` | `120` | Tiempo máximo de espera de la respuesta |
+| Constante                | Valor                                 | Uso                                                     |
+| ------------------------ | ------------------------------------- | ------------------------------------------------------- |
+| `OLLAMA_URL`             | `http://localhost:11434/api/generate` | Dirección de la API de Ollama                           |
+| `OLLAMA_MODEL`           | `llama3.2:3b`                         | Modelo que se consulta                                  |
+| `OLLAMA_TEMPERATURE`     | `0.2`                                 | Valores bajos hacen que el modelo se apegue a los datos |
+| `OLLAMA_TIMEOUT_SECONDS` | `120`                                 | Tiempo máximo de espera de la respuesta                 |
 
 ## Limitaciones conocidas
 

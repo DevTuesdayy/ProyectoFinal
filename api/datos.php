@@ -129,23 +129,25 @@ function loadRecords(): array
     $latest = [];
     foreach (glob(DATA_DIR . '/cana_*.csv') as $file) {
         $handle = fopen($file, 'r');
-        $header = array_map(fn ($column) => COLUMN_ALIASES[$column] ?? $column, fgetcsv($handle, escape: ''));
+        $header = array_map(fn($column) => COLUMN_ALIASES[$column] ?? $column, fgetcsv($handle, escape: ''));
         while (($row = fgetcsv($handle, escape: '')) !== false) {
-            if (count($row) !== count($header)) continue;
+            if (count($row) !== count($header))
+                continue;
             $row = array_combine($header, $row);
             $record = ['ingenio' => millName($row['ingenio']), 'zafra' => trim($row['zafra'])];
             foreach (NUMERIC_FIELDS as $field) {
                 $record[$field] = is_numeric($row[$field] ?? null) ? (float) $row[$field] : null;
             }
             $key = "{$record['zafra']}|{$record['ingenio']}";
-            if (!isset($latest[$key]) || $record['semana'] > $latest[$key]['semana']) $latest[$key] = $record;
+            if (!isset($latest[$key]) || $record['semana'] > $latest[$key]['semana'])
+                $latest[$key] = $record;
         }
         fclose($handle);
     }
     ksort($latest);
 
     // En eficiencia y caña neta un 0 significa "no reportado"; en los tipos de azúcar es producción real de 0.
-    return array_map(fn ($r) => [
+    return array_map(fn($r) => [
         ...$r,
         'eficiencia_fabrica' => $r['eficiencia_fabrica'] ?: null,
         'cana_molida_neta' => $r['cana_molida_neta'] ?: null,

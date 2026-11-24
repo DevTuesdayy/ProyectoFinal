@@ -54,14 +54,23 @@ function percentChange(float $from, float $to): ?float
     return $from == 0 ? null : round(($to - $from) / $from * 100, 1);
 }
 
+function comparableRecords(array $records, string $harvest): array
+{
+    if ($harvest !== ALL) {
+        return $records;
+    }
+
+    return array_filter($records, fn ($record) => $record['zafra'] !== HARVEST_IN_PROGRESS);
+}
+
 function buildAnalysis(array $records, string $mill, string $harvest, string $indicator): ?array{
-    $selected = filterRecords($records, $mill, $harvest);
+    $selected = comparableRecords(filterRecords($records, $mill, $harvest), $harvest);
     $values = indicatorValues($selected, $indicator);
     if(!$values){
         return null;
     }
 
-    $reference = filterRecords($records, ALL, $harvest);
+    $reference = comparableRecords(filterRecords($records, ALL, $harvest), $harvest);
     $nationalAverage = average(indicatorValues($reference, $indicator));
 
     $millAverages = averageBy($reference, $indicator, 'ingenio');
@@ -113,5 +122,6 @@ function buildAnalysis(array $records, string $mill, string $harvest, string $in
             'hasta' => array_key_last($recentTrend),
             'cambio_pct' => percentChange(reset($recentTrend), end($recentTrend)),
         ],
+        'es_parcial' => $harvest === HARVEST_IN_PROGRESS,
     ];
 }
